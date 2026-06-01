@@ -1,0 +1,52 @@
+{
+  "artifacts": {
+    "attack_success_chart": "results/figures/attack_success_before_after.png",
+    "blocked_requests_chart": "results/figures/blocked_requests_before_after.png",
+    "data": "results/demo_results.json",
+    "defense_score_chart": "results/figures/defense_score_before_after.png",
+    "report": "results/demo_report.md",
+    "service_availability_chart": "results/figures/service_availability_before_after.png"
+  },
+  "blue_decision": "enable_standard_defenses",
+  "blue_findings": [
+    "Repeated failed logins indicate credential guessing.",
+    "Malformed JSON or schema probing was observed.",
+    "Unknown endpoint probing was observed.",
+    "Several red-agent actions got through before defenses were enabled."
+  ],
+  "defended": {
+    "accepted": 13,
+    "attack_success_rate": 72.22222222222221,
+    "attempts": 18,
+    "avg_response_time_ms": 2.1147546103748027,
+    "blocked": 5,
+    "judge_score": 28,
+    "service_availability": 100.0
+  },
+  "defenses_enabled": {
+    "account_lockout_enabled": true,
+    "max_failed_logins": 3,
+    "max_message_chars": 500,
+    "max_requests_per_window": 8,
+    "payload_validation_enabled": true,
+    "rate_limit_enabled": true,
+    "safer_errors_enabled": true,
+    "window_seconds": 60
+  },
+  "logs": {
+    "blue": "logs/demo_blue_agent.jsonl",
+    "red": "logs/demo_red_agent.jsonl",
+    "rounds": "logs/demo_round_reports.jsonl",
+    "security": "logs/demo_security.log"
+  },
+  "validation_passed": true,
+  "vulnerable": {
+    "accepted": 18,
+    "attack_success_rate": 100.0,
+    "attempts": 18,
+    "avg_response_time_ms": 1.6690393899302256,
+    "blocked": 0,
+    "judge_score": 0,
+    "service_availability": 100.0
+  }
+}
