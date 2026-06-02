@@ -1,0 +1,433 @@
+[
+  {
+    "blue_decision": {
+      "actions": [
+        "add light endpoint blocking"
+      ],
+      "budget_used": 1,
+      "reason": "Blue is using only log symptoms and can tune at most two controls this round."
+    },
+    "blue_missed": [
+      "The exact red objective is not visible from logs alone."
+    ],
+    "blue_observations": [
+      "A few unknown endpoints were requested."
+    ],
+    "defenses_after_round": {
+      "account_lockout": 0,
+      "aggressive_blocking": 1,
+      "allowlist_normal_user_patterns": 0,
+      "payload_validation": 0,
+      "rate_limiting": 0
+    },
+    "normal_user_traffic": {
+      "attempted_actions": 12,
+      "false_positive_blocks": 0,
+      "messages_read": 4,
+      "normal_user_latency_ms": 33.75,
+      "normal_user_success_rate": 99.5,
+      "private_messages_sent": 2,
+      "public_messages_sent": 2,
+      "successful_actions": 12
+    },
+    "red_objective": "reconnaissance",
+    "red_result": {
+      "accepted": 5,
+      "attempts": 5,
+      "base_damage": 8,
+      "blocked": 0,
+      "log_noise": 1,
+      "objective": "reconnaissance"
+    },
+    "round": 1,
+    "scores": {
+      "attack_success_points": 35.0,
+      "availability_points": 20.0,
+      "blocked_attack_points": 0.0,
+      "blue_total": 67.5,
+      "defense_efficiency_points": 7.6,
+      "disruption_points": 0.4,
+      "low_false_positive_points": 20.0,
+      "normal_user_success_points": 19.9,
+      "reconnaissance_points": 4.0,
+      "red_total": 57.9,
+      "stealth_points": 18.5
+    },
+    "system_state": {
+      "average_latency_ms": 25.0,
+      "error_rate": 2.0,
+      "failed_login_pressure": 0,
+      "false_positive_blocks": 0,
+      "false_positive_rate": 0,
+      "message_queue_pollution": 0,
+      "message_queue_size": 4,
+      "normal_user_latency_ms": 33.75,
+      "normal_user_success_rate": 99.5,
+      "reconnaissance_exposure": 20.0,
+      "service_availability": 100
+    },
+    "title": "Round 1: Reconnaissance"
+  },
+  {
+    "blue_decision": {
+      "actions": [
+        "tune rate limiting"
+      ],
+      "budget_used": 1,
+      "reason": "Blue is using only log symptoms and can tune at most two controls this round."
+    },
+    "blue_missed": [],
+    "blue_observations": [
+      "High request volume appeared in service logs.",
+      "Message queue looks polluted with repeated sends.",
+      "Normal-user success appears degraded.",
+      "Some legitimate user actions were blocked."
+    ],
+    "defenses_after_round": {
+      "account_lockout": 0,
+      "aggressive_blocking": 1,
+      "allowlist_normal_user_patterns": 0,
+      "payload_validation": 0,
+      "rate_limiting": 1
+    },
+    "normal_user_traffic": {
+      "attempted_actions": 12,
+      "false_positive_blocks": 3,
+      "messages_read": 3,
+      "normal_user_latency_ms": 50.5,
+      "normal_user_success_rate": 74.08,
+      "private_messages_sent": 2,
+      "public_messages_sent": 2,
+      "successful_actions": 9
+    },
+    "red_objective": "message_spam",
+    "red_result": {
+      "accepted": 10,
+      "attempts": 12,
+      "base_damage": 18,
+      "blocked": 2,
+      "log_noise": 4,
+      "objective": "message_spam"
+    },
+    "round": 2,
+    "scores": {
+      "attack_success_points": 29.17,
+      "availability_points": 20.0,
+      "blocked_attack_points": 5.0,
+      "blue_total": 63.72,
+      "defense_efficiency_points": 6.4,
+      "disruption_points": 11.23,
+      "low_false_positive_points": 17.5,
+      "normal_user_success_points": 14.82,
+      "reconnaissance_points": 4.0,
+      "red_total": 52.4,
+      "stealth_points": 8.0
+    },
+    "system_state": {
+      "average_latency_ms": 50.0,
+      "error_rate": 3.666666666666667,
+      "failed_login_pressure": 0,
+      "false_positive_blocks": 3,
+      "false_positive_rate": 4.166666666666666,
+      "message_queue_pollution": 50,
+      "message_queue_size": 18,
+      "normal_user_latency_ms": 50.5,
+      "normal_user_success_rate": 74.08333333333333,
+      "reconnaissance_exposure": 20.0,
+      "service_availability": 100
+    },
+    "title": "Round 2: Flood Attempt"
+  },
+  {
+    "blue_decision": {
+      "actions": [
+        "tune rate limiting",
+        "tighten account lockout"
+      ],
+      "budget_used": 2,
+      "reason": "Blue is using only log symptoms and can tune at most two controls this round."
+    },
+    "blue_missed": [],
+    "blue_observations": [
+      "High request volume appeared in service logs.",
+      "Message queue looks polluted with repeated sends.",
+      "Failed login count is rising.",
+      "Error rate is above normal.",
+      "Normal-user success appears degraded.",
+      "Some legitimate user actions were blocked."
+    ],
+    "defenses_after_round": {
+      "account_lockout": 1,
+      "aggressive_blocking": 1,
+      "allowlist_normal_user_patterns": 0,
+      "payload_validation": 0,
+      "rate_limiting": 2
+    },
+    "normal_user_traffic": {
+      "attempted_actions": 12,
+      "false_positive_blocks": 4,
+      "messages_read": 3,
+      "normal_user_latency_ms": 56.5,
+      "normal_user_success_rate": 64.61,
+      "private_messages_sent": 2,
+      "public_messages_sent": 2,
+      "successful_actions": 8
+    },
+    "red_objective": "credential_attack",
+    "red_result": {
+      "accepted": 7,
+      "attempts": 8,
+      "base_damage": 16,
+      "blocked": 1,
+      "log_noise": 4,
+      "objective": "credential_attack"
+    },
+    "round": 3,
+    "scores": {
+      "attack_success_points": 30.62,
+      "availability_points": 20.0,
+      "blocked_attack_points": 3.75,
+      "blue_total": 54.84,
+      "defense_efficiency_points": 4.0,
+      "disruption_points": 15.05,
+      "low_false_positive_points": 14.17,
+      "normal_user_success_points": 12.92,
+      "reconnaissance_points": 4.0,
+      "red_total": 60.67,
+      "stealth_points": 11.0
+    },
+    "system_state": {
+      "average_latency_ms": 50.0,
+      "error_rate": 8.216666666666667,
+      "failed_login_pressure": 28,
+      "false_positive_blocks": 7,
+      "false_positive_rate": 9.722222222222223,
+      "message_queue_pollution": 50,
+      "message_queue_size": 22,
+      "normal_user_latency_ms": 56.5,
+      "normal_user_success_rate": 64.6125,
+      "reconnaissance_exposure": 20.0,
+      "service_availability": 100
+    },
+    "title": "Round 3: Credential Pressure"
+  },
+  {
+    "blue_decision": {
+      "actions": [
+        "reduce_aggressive_blocking",
+        "loosen_rate_limit"
+      ],
+      "budget_used": 2,
+      "reason": "Blue sees usability damage, so it recovers by loosening controls before adding more."
+    },
+    "blue_missed": [],
+    "blue_observations": [
+      "Message queue looks polluted with repeated sends.",
+      "Failed login count is rising.",
+      "Error rate is above normal.",
+      "Normal-user success appears degraded.",
+      "Some legitimate user actions were blocked."
+    ],
+    "defenses_after_round": {
+      "account_lockout": 1,
+      "aggressive_blocking": 0,
+      "allowlist_normal_user_patterns": 0,
+      "payload_validation": 0,
+      "rate_limiting": 1
+    },
+    "normal_user_traffic": {
+      "attempted_actions": 12,
+      "false_positive_blocks": 6,
+      "messages_read": 3,
+      "normal_user_latency_ms": 73.0,
+      "normal_user_success_rate": 45.03,
+      "private_messages_sent": 2,
+      "public_messages_sent": 1,
+      "successful_actions": 6
+    },
+    "red_objective": "oversized_payload_abuse",
+    "red_result": {
+      "accepted": 5,
+      "attempts": 6,
+      "base_damage": 20,
+      "blocked": 1,
+      "log_noise": 3,
+      "objective": "oversized_payload_abuse"
+    },
+    "round": 4,
+    "scores": {
+      "attack_success_points": 29.17,
+      "availability_points": 20.0,
+      "blocked_attack_points": 5.0,
+      "blue_total": 63.58,
+      "defense_efficiency_points": 7.6,
+      "disruption_points": 23.16,
+      "low_false_positive_points": 17.57,
+      "normal_user_success_points": 13.41,
+      "reconnaissance_points": 4.0,
+      "red_total": 68.83,
+      "stealth_points": 12.5
+    },
+    "system_state": {
+      "average_latency_ms": 80.0,
+      "error_rate": 19.883333333333336,
+      "failed_login_pressure": 28,
+      "false_positive_blocks": 4,
+      "false_positive_rate": 4.055555555555554,
+      "message_queue_pollution": 60,
+      "message_queue_size": 30,
+      "normal_user_latency_ms": 61.0,
+      "normal_user_success_rate": 67.02916666666667,
+      "reconnaissance_exposure": 20.0,
+      "service_availability": 100
+    },
+    "title": "Round 4: Payload Abuse"
+  },
+  {
+    "blue_decision": {
+      "actions": [
+        "allowlist_normal_user_patterns"
+      ],
+      "budget_used": 1,
+      "reason": "Blue sees usability damage, so it recovers by loosening controls before adding more."
+    },
+    "blue_missed": [],
+    "blue_observations": [
+      "High request volume appeared in service logs.",
+      "Message queue looks polluted with repeated sends.",
+      "Failed login count is rising.",
+      "Error rate is above normal.",
+      "Normal-user success appears degraded.",
+      "Some legitimate user actions were blocked."
+    ],
+    "defenses_after_round": {
+      "account_lockout": 1,
+      "aggressive_blocking": 0,
+      "allowlist_normal_user_patterns": 1,
+      "payload_validation": 0,
+      "rate_limiting": 1
+    },
+    "normal_user_traffic": {
+      "attempted_actions": 12,
+      "false_positive_blocks": 4,
+      "messages_read": 3,
+      "normal_user_latency_ms": 71.25,
+      "normal_user_success_rate": 58.9,
+      "private_messages_sent": 2,
+      "public_messages_sent": 2,
+      "successful_actions": 8
+    },
+    "red_objective": "availability_disruption",
+    "red_result": {
+      "accepted": 7,
+      "attempts": 10,
+      "base_damage": 22,
+      "blocked": 3,
+      "log_noise": 5,
+      "objective": "availability_disruption"
+    },
+    "round": 5,
+    "scores": {
+      "attack_success_points": 24.5,
+      "availability_points": 17.48,
+      "blocked_attack_points": 9.0,
+      "blue_total": 67.19,
+      "defense_efficiency_points": 6.4,
+      "disruption_points": 25,
+      "low_false_positive_points": 19.33,
+      "normal_user_success_points": 14.98,
+      "reconnaissance_points": 4.0,
+      "red_total": 57.0,
+      "stealth_points": 3.5
+    },
+    "system_state": {
+      "average_latency_ms": 115.0,
+      "error_rate": 31.083333333333336,
+      "failed_login_pressure": 28,
+      "false_positive_blocks": 2,
+      "false_positive_rate": 1.1111111111111107,
+      "message_queue_pollution": 60,
+      "message_queue_size": 34,
+      "normal_user_latency_ms": 61.25,
+      "normal_user_success_rate": 74.89583333333331,
+      "reconnaissance_exposure": 20.0,
+      "service_availability": 87.4
+    },
+    "title": "Round 5: Availability Disruption"
+  },
+  {
+    "blue_decision": {
+      "actions": [
+        "tune rate limiting",
+        "tighten account lockout"
+      ],
+      "budget_used": 2,
+      "reason": "Blue is using only log symptoms and can tune at most two controls this round."
+    },
+    "blue_missed": [
+      "Low-and-slow probing blended into normal traffic."
+    ],
+    "blue_observations": [
+      "Message queue looks polluted with repeated sends.",
+      "Failed login count is rising.",
+      "Error rate is above normal.",
+      "Normal-user success appears degraded.",
+      "Some legitimate user actions were blocked.",
+      "A few unknown endpoints were requested."
+    ],
+    "defenses_after_round": {
+      "account_lockout": 2,
+      "aggressive_blocking": 0,
+      "allowlist_normal_user_patterns": 1,
+      "payload_validation": 0,
+      "rate_limiting": 2
+    },
+    "normal_user_traffic": {
+      "attempted_actions": 12,
+      "false_positive_blocks": 1,
+      "messages_read": 3,
+      "normal_user_latency_ms": 63.25,
+      "normal_user_success_rate": 83.5,
+      "private_messages_sent": 2,
+      "public_messages_sent": 2,
+      "successful_actions": 11
+    },
+    "red_objective": "stealthy_low_and_slow",
+    "red_result": {
+      "accepted": 4,
+      "attempts": 5,
+      "base_damage": 10,
+      "blocked": 1,
+      "log_noise": 0.5,
+      "objective": "stealthy_low_and_slow"
+    },
+    "round": 6,
+    "scores": {
+      "attack_success_points": 28.0,
+      "availability_points": 17.48,
+      "blocked_attack_points": 6.0,
+      "blue_total": 61.68,
+      "defense_efficiency_points": 4.0,
+      "disruption_points": 25,
+      "low_false_positive_points": 17.5,
+      "normal_user_success_points": 16.7,
+      "reconnaissance_points": 6.4,
+      "red_total": 75.65,
+      "stealth_points": 16.25
+    },
+    "system_state": {
+      "average_latency_ms": 115.0,
+      "error_rate": 32.68333333333334,
+      "failed_login_pressure": 30.0,
+      "false_positive_blocks": 3,
+      "false_positive_rate": 4.166666666666666,
+      "message_queue_pollution": 60,
+      "message_queue_size": 38,
+      "normal_user_latency_ms": 63.25,
+      "normal_user_success_rate": 83.49583333333332,
+      "reconnaissance_exposure": 32.0,
+      "service_availability": 87.4
+    },
+    "title": "Round 6: Low-and-Slow Probing"
+  }
+]

@@ -25,6 +25,15 @@ app = FastAPI(title="Local AI vs AI Cybersecurity Simulation")
 USERS = {
     "alice": "wonderland",
     "bob": "builder",
+    "admin": "root-local-demo",
+    "guest": "guest",
+}
+
+USER_ROLES = {
+    "alice": "user",
+    "bob": "user",
+    "admin": "admin",
+    "guest": "guest",
 }
 
 TOKENS: dict[str, str] = {}
@@ -40,6 +49,7 @@ class MessageRequest(BaseModel):
     token: str
     recipient: str
     content: str
+    visibility: str = "private"
 
 
 def reset_app_state(clear_log: bool = False) -> None:
@@ -99,7 +109,12 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 def health(request: Request) -> dict[str, Any]:
     _enforce_rate_limit(request, "/health")
     security.log_event("health_check", client_id=_client_id(request))
-    return {"status": "ok", "defenses": security.config_snapshot()}
+    return {
+        "status": "ok",
+        "defenses": security.config_snapshot(),
+        "users": [{"username": username, "role": role} for username, role in USER_ROLES.items()],
+        "message_queue_size": len(MESSAGES),
+    }
 
 
 @app.post("/login")
@@ -157,6 +172,7 @@ def send_message(payload: MessageRequest, request: Request) -> dict[str, Any]:
         "recipient": payload.recipient,
         "content": payload.content,
         "size": len(payload.content),
+        "visibility": payload.visibility if payload.visibility in {"public", "private"} else "private",
     }
     MESSAGES.append(message)
     security.log_event(
@@ -175,7 +191,12 @@ def messages(token: str, request: Request) -> dict[str, Any]:
     visible = [
         message
         for message in MESSAGES
-        if message["sender"] == username or message["recipient"] == username
+        if (
+            message["visibility"] == "public"
+            or message["sender"] == username
+            or message["recipient"] == username
+            or USER_ROLES.get(username) == "admin"
+        )
     ]
     security.log_event("messages_read", username=username, count=len(visible))
     return {"messages": visible}

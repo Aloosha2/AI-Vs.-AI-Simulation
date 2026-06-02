@@ -1,78 +1,96 @@
-# AI vs AI Local Cybersecurity Demo Report
+# AI vs AI Multi-Round Cyber Battle Report
 
 ## Project Overview
 
-This project is a local-only educational cyber range. It models an AI-vs-AI security workflow around a toy communication service. The red agent behaves like a bounded attacker, the blue agent behaves like a defender, and the judge compares what happened before and after defenses were enabled.
+This is a local-only educational cyber range. The arena is a toy FastAPI communication channel: users log in, send messages, read messages, and expose a health endpoint. The battle is not a real penetration test. It is a classroom simulation that shows how attack pressure, defensive tradeoffs, and scoring can evolve over multiple rounds.
 
-## What the Toy Communication Channel Represents
+## Technical Arena
 
-The service is a small FastAPI chat-style API. It has:
+The toy service has `POST /login`, `POST /send_message`, `GET /messages`, and `GET /health`. It models four users: `alice` and `bob` as regular users, `admin` as an administrator, and `guest` as a low-privilege user. Messages can be public or private, users receive auth tokens after login, and the health endpoint exposes the current message queue size.
 
-- `POST /login` for username/password login.
-- `POST /send_message` for sending a message with a token.
-- `GET /messages` for reading messages visible to a user.
-- `GET /health` for service health and current defense settings.
+The simulation tracks state around that service: service availability, latency, error rate, message queue pollution, message queue size, failed-login pressure, reconnaissance exposure, false positives, false-positive blocks, normal-user latency, and normal-user success. These state variables make attacks matter beyond a simple accepted/blocked counter.
 
-Technically, the server keeps users, tokens, messages, defense settings, and rate-limit counters in local memory. Security events are written to local JSON-lines logs. The initial service is intentionally weak: it has no rate limiting, no account lockout, weak payload checks, no message size limit, and verbose errors.
+## Normal-User Simulator
+
+During every round, legitimate users attempt to log in, send public/private messages, and read messages. This represents the business goal of the system: normal users should still be able to communicate while blue is defending the service. The judge penalizes blue when defenses cause false-positive blocks, increase normal-user latency, or reduce normal-user success.
 
 ## Red Agent Strategy
 
-The red agent only targets the local demo server. It observes `/health`, chooses from a fixed safe set of demo actions, executes bounded requests, and records findings. The safe actions are repeated failed logins, message spam, oversized messages, malformed JSON, and simple endpoint probing.
-
-In the vulnerable round, the red agent is expected to succeed at some actions because the controls are intentionally disabled.
+The red agent runs 6 bounded local rounds. Objectives include reconnaissance, message spam, credential pressure, payload abuse, availability disruption, and low-and-slow probing. Red adapts: if one path is heavily blocked, it shifts toward another objective such as payload abuse or stealthy probing.
 
 ## Blue Agent Strategy
 
-The blue agent reads the local service log and recent red-agent results. It looks for suspicious behavior such as repeated login failures, message floods, malformed requests, endpoint probes, and accepted red-agent actions. In this demo it chose: **Enable standard defenses**.
+The blue agent does not see the judge's ground truth before choosing. It sees only log-style symptoms: volume spikes, failed login pressure, queue pollution, error increases, unknown endpoint activity, and normal-user degradation alerts. Each round it can tune only 1-2 defenses, so it must choose between rate limiting, account lockout, payload validation, and endpoint blocking.
 
-The enabled defenses were: **rate limit, account lockout, payload validation, safer errors**.
+## Defense Tradeoffs
 
-Technically, the defense profile turns on request rate limiting, account lockout after repeated failures, payload validation with a message size cap, and safer error messages.
+- Rate limiting can reduce spam and availability attacks, but it may slow or block normal-user sends and reads. If usability drops too far, blue can `loosen_rate_limit`.
+- Account lockout can reduce credential attacks, but it can lock out valid users after mistakes or pressure. If false positives rise, blue can `loosen_account_lockout`.
+- Payload validation blocks oversized messages, but strict validation can reject legitimate long messages.
+- Aggressive blocking can reduce reconnaissance, but it has a higher false-positive and defense-cost penalty. Blue can `reduce_aggressive_blocking`.
+- Allowlisting normal-user patterns can recover legitimate traffic, but it consumes part of blue's limited action budget.
 
 ## Judge Scoring System
 
-The judge scores each round from 0 to 100 based on how many red-agent attempts were blocked. A higher score means the service mitigated more of the bounded local attack attempts. The judge also reports attack success rate, blocked requests, average response time, and service availability.
+The judge has full ground truth after each round. Red receives attack success, disruption, reconnaissance, and stealth points. Blue receives blocked attack, availability, normal-user success, low false-positive, and defense-efficiency points.
 
-## Before/After Metrics
+The scoring formula is intentionally presentation-friendly: each component is capped, and totals are shown separately for red and blue so the audience can see the tradeoff between stopping attacks and preserving service quality. Normal-user success, normal-user latency, and false-positive blocks are part of the judge's ground truth, but blue only sees symptoms before it chooses defenses.
 
-| Metric | Vulnerable Round | Defended Round |
-|---|---:|---:|
-| Attack attempts | 18 | 18 |
-| Accepted attempts | 18 | 13 |
-| Blocked requests | 0 | 5 |
-| Attack success rate | 100.0% | 72.2% |
-| Average response time | 1.67 ms | 2.11 ms |
-| Service availability | 100.0% | 100.0% |
-| Judge defense score | 0/100 | 28/100 |
+## Round Timeline
 
-## Chart Explanations
+| Round | Battle Phase | Blue Action | Red Score | Blue Score |
+|---:|---|---|---:|---:|
+| 1 | Round 1: Reconnaissance | add light endpoint blocking | 57.9 | 67.5 |
+| 2 | Round 2: Flood Attempt | tune rate limiting | 52.4 | 63.7 |
+| 3 | Round 3: Credential Pressure | tune rate limiting, tighten account lockout | 60.7 | 54.8 |
+| 4 | Round 4: Payload Abuse | reduce_aggressive_blocking, loosen_rate_limit | 68.8 | 63.6 |
+| 5 | Round 5: Availability Disruption | allowlist_normal_user_patterns | 57.0 | 67.2 |
+| 6 | Round 6: Low-and-Slow Probing | tune rate limiting, tighten account lockout | 75.7 | 61.7 |
 
-### Attack Success Before/After
+## Final System State
 
-![Attack Success Before/After](figures/attack_success_before_after.png)
+```json
+{
+  "service_availability": 87.4,
+  "average_latency_ms": 115.0,
+  "error_rate": 32.68333333333334,
+  "message_queue_pollution": 60,
+  "message_queue_size": 38,
+  "failed_login_pressure": 30.0,
+  "reconnaissance_exposure": 32.0,
+  "false_positive_rate": 4.166666666666666,
+  "false_positive_blocks": 3,
+  "normal_user_success_rate": 83.49583333333332,
+  "normal_user_latency_ms": 63.25
+}
+```
 
-This chart shows the percentage of red-agent attempts that were accepted by the service. A lower defended value means the blue-agent controls reduced attacker success.
+## Charts
 
-### Blocked Requests Before/After
+![Attack Success](figures/attack_success_before_after.png)
 
-![Blocked Requests Before/After](figures/blocked_requests_before_after.png)
+Shows first-round versus final-round red attack success.
 
-This chart shows how many requests were blocked by defensive controls. In the vulnerable round this is low or zero because the controls start disabled.
+![Blocked Requests](figures/blocked_requests_before_after.png)
 
-### Service Availability Before/After
+Shows how blue's blocking changed from the opening round to the final round.
 
-![Service Availability Before/After](figures/service_availability_before_after.png)
+![Service Availability](figures/service_availability_before_after.png)
 
-This chart confirms that the demo service stayed available while defenses were applied. The goal is to mitigate attacks without crashing the service.
+Shows whether the service stayed usable while defenses were added.
 
-### Defense Score Before/After
+![Blue Score](figures/defense_score_before_after.png)
 
-![Defense Score Before/After](figures/defense_score_before_after.png)
+Shows the judge's blue score at the start and end of the battle.
 
-This chart shows the judge's 0-to-100 defense score. It increases when more red-agent attempts are blocked.
+![Score Timeline](figures/score_timeline.png)
+
+Shows red and blue score changes across all rounds.
+
+![System State Timeline](figures/system_state_timeline.png)
+
+Shows the evolving service state: availability, normal-user success, error rate, message pollution, and reconnaissance exposure.
 
 ## Limitations and Safety Statement
 
-This is a toy simulation, not a real security testing platform. The attacks are intentionally bounded, local-only, and designed for classroom explanation. The code must never be used against public systems, third-party services, classmates' devices, or any machine you do not own and explicitly control.
-
-The simulation simplifies many real-world details. It uses in-memory state, simple scoring, fixed red-agent strategies, and a single standard blue-agent defense profile. Its purpose is to explain security concepts and defensive reasoning, not to validate production security.
+This is a toy local simulation. It uses bounded request patterns and a simplified scoring model. It must never target public systems, third-party services, classmates' machines, or any system you do not own and explicitly control. The goal is to explain defensive reasoning and tradeoffs, not to validate production security.

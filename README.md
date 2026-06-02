@@ -12,7 +12,7 @@ This project must only run locally on your own machine. The red-team agent is in
 - Baseline weaknesses: no rate limiting, weak payload validation, no message size limit, and verbose errors.
 - Safe local red-team scenarios: failed login bursts, message spam, oversized payloads, malformed JSON, and endpoint probing.
 - Blue-team response: log review, suspicious behavior summaries, rate limiting, account lockout, payload validation, and safer errors.
-- A judge that compares a vulnerable baseline round with a defended round.
+- A judge that scores a multi-round red-team/blue-team battle.
 - A Rich terminal dashboard with cyber-themed panels, an event feed, service health, and a live scoreboard.
 - Explicit agent loops that are easy to explain in a presentation.
 
@@ -100,10 +100,13 @@ Demo mode:
 
 - Starts the FastAPI server on an automatically selected `127.0.0.1` localhost port.
 - Narrates each phase with presentation-friendly explanations and short pauses.
-- Runs one vulnerable red-team round and shows successful attacks.
-- Runs the blue-team agent to analyze logs, choose a defense action, apply defenses, and validate them.
-- Runs a second red-team round against the defended service.
-- Prints a clean before/after summary with attack success rate, blocked requests, average response time, service availability, and judge score.
+- Runs 6 battle rounds with objectives such as reconnaissance, message spam, credential pressure, payload abuse, availability disruption, and low-and-slow probing.
+- Shows the red objective, visible system damage, blue's limited observations, blue's defense decision, and the judge's full verdict after each round.
+- Simulates normal users every round: `alice`, `bob`, `admin`, and `guest` log in, send public/private messages, and read messages.
+- Gives blue a defense budget of only 1-2 changes per round, so it cannot enable everything immediately.
+- Tracks defense tradeoffs: rate limiting, account lockout, strict validation, and aggressive blocking can help, but may add false positives, increase normal-user latency, or block legitimate users.
+- Allows blue to recover from over-defense with `loosen_rate_limit`, `loosen_account_lockout`, `reduce_aggressive_blocking`, and `allowlist_normal_user_patterns`.
+- Prints a final battle timeline and first-round versus final-round summary.
 - Automatically saves demo data, charts, and a Markdown report.
 
 It is designed to finish under 60 seconds and writes demo logs under `logs/demo_*`.
@@ -111,11 +114,35 @@ It is designed to finish under 60 seconds and writes demo logs under `logs/demo_
 Demo artifacts are saved here:
 
 - `results/demo_results.json`: structured before/after metrics and artifact paths.
+- `results/round_history.json`: per-round objectives, blue observations, missed signals, defense decisions, system state, and red/blue scores.
 - `results/demo_report.md`: presentation-ready report explaining the scenario, technical setup, agent strategies, scoring, charts, limitations, and safety statement.
 - `results/figures/attack_success_before_after.png`
 - `results/figures/blocked_requests_before_after.png`
 - `results/figures/service_availability_before_after.png`
 - `results/figures/defense_score_before_after.png`
+- `results/figures/score_timeline.png`
+- `results/figures/system_state_timeline.png`
+
+The judge tracks separate red and blue scores:
+
+- Red score: attack success, disruption, reconnaissance, and stealth.
+- Blue score: blocked attacks, availability, normal-user success, low false positives, and defense efficiency.
+
+The judge also tracks system and usability metrics:
+
+- `service_availability`
+- `average_latency_ms`
+- `error_rate`
+- `message_queue_pollution`
+- `message_queue_size`
+- `failed_login_pressure`
+- `reconnaissance_exposure`
+- `normal_user_success_rate`
+- `normal_user_latency_ms`
+- `false_positive_blocks`
+- `false_positive_rate`
+
+The blue agent does not see the full judge score before choosing a defense. It only sees log-style symptoms and alert summaries, while the judge reveals full ground truth to the audience after the defense decision.
 
 For fast testing without narration:
 
@@ -149,8 +176,9 @@ pytest
 
 1. Start with the baseline server state and show `/health` reporting disabled defenses.
 2. Run `python demo.py --presentation` for the narrated classroom before/after demo.
-3. Discuss which red-team scenarios were accepted by the vulnerable baseline.
-4. Review `logs/security.log` to show what the blue agent sees.
-5. Explain how the defended round changes outcomes through rate limiting, account lockout, payload validation, and safer errors.
+3. Explain the business goal: normal users should still be able to log in, send messages, and read messages.
+4. Discuss how red adapts when a defense blocks one path.
+5. Explain that blue sees only symptoms, not the judge's full ground truth.
+6. Use `results/demo_report.md` and `results/figures/` for the final presentation artifacts.
 
 This is a deliberately simplified model. It is useful for learning defensive reasoning and secure design basics, not for testing real systems.
